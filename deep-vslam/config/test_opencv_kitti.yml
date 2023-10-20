@@ -1,0 +1,52 @@
+tag: kitti
+
+batch_size:    20  
+keyframe_period: 5  # this value has to correspond to keyframe rate of extraction of data (5 is usual)
+
+threshold: 0.1
+delta_max: 0.0001
+enable_timing: False
+training_mode: False
+train_outlier_model: False
+train_correction_model: False
+pipeline_steps:
+  - normalize-correspondences
+  - point-net-outlier-detector
+  - opencv-pose-solver
+  - back-to-world-frame
+  - pose-matrix-to-vector
+  - normalize-trajectory
+  - lstm-correction
+  - pose-vector-to-mat
+
+loss_weights:
+  supervised-kalman-correction-mse-loss: 0.0
+  kalman-correction-mse-loss: 1.0
+#LSTM
+input_size: 1024 
+output_size: 6
+d_model: 96
+dim_feedforward: 192
+num_layers: 4
+n_heads: 3
+
+test_with_correction: False  # option to test with or without application of correction network after  outlier network and initial estimation
+
+kalman_parameters_path: /srv/beegfs02/scratch/deep_slam/data/data_sets/kitti/kalman_parameters/
+outlier_rejection_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_all/sup/outlier_network_state_dict.pth
+kalman_correction_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_all/sup/kalman_correction_state_dict.pth
+extracted_data_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/correspondences/extracted_features_all_sequences_new_format_TMP.h5
+result_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data_backup/tests_all/test_examples/
+test_sequences: ['00','02'] # choice of sequences to test
+
+# first run these commands to create trajectory
+# cd ..
+# cd sbatch_tutorial/
+# sbatch sbatch_test.sh
+
+# now run these to evaluate it
+# cd ..
+# cd kitti-odom-eval/
+# source activate kitti_eval
+# RES_DIR=/srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data_backup/tests_all/test_sup_outlier/
+# python eval_odom.py --result $RES_DIR 

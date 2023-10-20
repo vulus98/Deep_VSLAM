@@ -1,0 +1,45 @@
+tag: kitti
+wandb_project_name: "outlier_network_kitti"
+
+enable_timing: False
+training_mode: True
+supervised_traning: True
+train_outlier_model: True
+train_correction_model: False
+load_outlier_model: True
+load_correction_model: False
+
+batch_size:    10
+keyframe_period: 5
+num_epochs:   100
+lr_start:      0.0001
+lr_decay:      0.1
+threshold:     0.5
+log_batch_period: 5
+save_model_epoch_period: 5
+
+pipeline_steps:
+  - normalize-correspondences
+  - point-net-outlier-detector
+  - dlt-pose-solver
+  - so3-matrix-projector
+  - back-to-world-frame
+
+
+loss_weights:
+  last-sv-loss: 0
+  last-svs-ratio-loss: 0
+  reprojection-loss: 0
+  inlier-loss: 0
+  supervised-pose-loss: 1
+  self-supervised-inlier-loss: 0.0
+  self-supervised-inlier-normal-loss: 0.0
+  self-supervised-pose-loss: 0.0
+
+kalman_parameters_path: /srv/beegfs02/scratch/deep_slam/data/data_sets/kitti/kalman_parameters/
+outlier_rejection_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_all/unsup/outlier_network_state_dict.pth
+extracted_data_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/correspondences/extracted_features_all_sequences_new_format_TMP.h5
+write_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_all/sup/
+
+train_sequences: ['00','02','03','04','05','06','07','08']
+test_sequences: ['00']

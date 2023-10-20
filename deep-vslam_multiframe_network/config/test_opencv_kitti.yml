@@ -1,0 +1,58 @@
+tag: kitti
+
+batch_size:    20
+multiframe_size: 13
+
+threshold: 0.1
+delta_max: 0.0001
+similarity_threshold: 0.5
+supervised_training: False
+train_outlier_model: False
+train_correction_model: False
+train_pose_outlier_model: False
+load_outlier_model: True
+load_correction_model: False
+load_pose_outlier_model: True
+pipeline_steps:
+  - normalize-correspondences
+  - point-net-outlier-detector
+  - opencv-pose-solver
+  - back-to-world-frame
+  - pose-outlier-network
+  # - pose-matrix-to-vector
+  # - normalize-trajectory
+  # - lstm-correction
+  # - pose-vector-to-mat
+
+loss_weights:
+  supervised-kalman-correction-mse-loss: 0.0
+  kalman-correction-mse-loss: 1.0
+#LSTM
+input_size: 1024 
+output_size: 6
+d_model: 96
+dim_feedforward: 192
+num_layers: 4
+n_heads: 3
+
+test_with_correction: False
+
+kalman_parameters_path: /srv/beegfs02/scratch/deep_slam/data/data_sets/kitti/kalman_parameters/
+outlier_rejection_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_all/sup/outlier_network_state_dict.pth
+pose_outlier_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_multiframe/sup/pose_outlier_network_state_dict.pth
+kalman_correction_model_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/models_multiframe/sup/kalman_correction_state_dict.pth
+extracted_data_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/correspondences/extracted_features_multiframe_all_new_format_TMP.h5
+result_path: /srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/tests_multiframe/test_sup_outlier/
+#test_sequences: ['00','01','02','03','04','05','06','07','08','09','10']
+test_sequences: ['00']
+
+
+# cd ..
+# cd sbatch_multiframe/
+# sbatch sbatch_test.sh
+
+# cd ..
+# cd kitti-odom-eval/
+# source activate kitti_eval
+# RES_DIR=/srv/beegfs02/scratch/deep_slam/data/vukasin/semester_project/data/tests_multiframe/test_sup_outlier/
+# python eval_odom.py --result $RES_DIR 
